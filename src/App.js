@@ -7,9 +7,9 @@ const average = (arr) =>
 const KEY = "b8a2cdd0";
 
 export default function App() {
-  const [query, setQuery] = useState("star wars");
-  const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState([]);
+  const [query, setQuery] = useState("");
+  const [movies, setMovies] = useState(tempMovieData);
+  const [watched, setWatched] = useState(tempWatchedData);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [numResult, setNumResult] = useState(null);
@@ -225,7 +225,7 @@ function MovieDetalis({
         document.removeEventListener("keydown", callback);
       };
     },
-    [selectedId]
+    [selectedId, setSelectedId]
   );
 
   useEffect(
@@ -250,7 +250,7 @@ function MovieDetalis({
       }
       fetchDetails();
     },
-    [selectedId]
+    [selectedId, KEY]
   );
 
   useEffect(
