@@ -1,18 +1,6 @@
 import { useEffect, useState } from "react";
 import StarRating from "./StarRating";
-// import { StarRating } from "./StarRating";
-// const tempWatchedData = [
-//   {
-//     imdbID: "tt1375666",
-//     Title: "Inception",
-//     Year: "2010",
-//     Poster:
-//       "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
-//     runtime: 148,
-//     imdbRating: 8.8,
-//     userRating: 10,
-//   },
-// ];
+
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
@@ -36,12 +24,15 @@ export default function App() {
 
   useEffect(
     function () {
+      const controller = new AbortController();
       async function fetchMovies() {
         try {
           setIsLoading(true);
           setError("");
           const response = await fetch(
-            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}
+            `,
+            { signal: controller.signal }
           );
           if (!response.ok) {
             throw new Error("Something went wrong with fetching movies");
@@ -54,19 +45,28 @@ export default function App() {
           }
 
           setMovies(data.Search);
+          setSelectedId("");
+          setError("");
           setNumResult(data.Search.length);
         } catch (err) {
-          setError(err.message || "Unknown error occurred");
+          if (err.message !== "signal is aborted without reason") {
+            setError(err.message);
+          }
         } finally {
           setIsLoading(false);
         }
       }
       if (query.length < 2) {
         setMovies([]);
+        setSelectedId("");
         setError("");
         return;
       }
       fetchMovies();
+
+      return function () {
+        controller.abort();
+      };
     },
     [query]
   );
@@ -214,6 +214,22 @@ function MovieDetalis({
 
   useEffect(
     function () {
+      function callback(e) {
+        if (e.code === "Escape") {
+          setSelectedId("");
+        }
+      }
+      document.addEventListener("keydown", callback);
+
+      return function () {
+        document.removeEventListener("keydown", callback);
+      };
+    },
+    [selectedId]
+  );
+
+  useEffect(
+    function () {
       async function fetchDetails() {
         try {
           setError("");
@@ -235,6 +251,18 @@ function MovieDetalis({
       fetchDetails();
     },
     [selectedId]
+  );
+
+  useEffect(
+    function () {
+      if (!title) return;
+      document.title = `Movie: ${title}`;
+
+      return function () {
+        document.title = "RateMovie";
+      };
+    },
+    [title]
   );
 
   return (
