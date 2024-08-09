@@ -86,7 +86,7 @@ export default function App() {
         controller.abort();
       };
     },
-    [query]
+    [query, movies]
   );
 
   return (
