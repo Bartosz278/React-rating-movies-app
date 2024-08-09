@@ -70,7 +70,7 @@ export function MovieDetalis({
           setError("");
           setIsLoading(true);
           const response = await fetch(
-            `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`
+            `https://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`
           );
           if (!response.ok) {
             throw new Error("Something went wrong.");
